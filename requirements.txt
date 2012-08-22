@@ -1,3 +1,4 @@
 Django==1.4.1
 Mock
 xlrd
+MySQL-python==1.2.3
