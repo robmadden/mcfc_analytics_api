@@ -26,7 +26,6 @@ def create_table(sheet):
     for column in row_values:
         if column in varchar_columns:
             column_map[column] = "VARCHAR(20)"
-            print column_map
         elif column in date_columns:
             column_map[column] = "DATETIME"
         else:
@@ -37,8 +36,8 @@ def create_table(sheet):
     columns = []
 
     create_columns_sql = """date DATETIME, player_surname VARCHAR(20), player_forename VARCHAR(20),
-                            team VARCHAR(20), opposition VARCHAR(20),
-                            player_id INT, team_id INT, opposition_id INT,
+                            team VARCHAR(20), opposition VARCHAR(30),
+                            player_id INT, team_id INT, opposition_id INT, venue VARCHAR(30), 
                             """
 
     for k,v in sorted(column_map.iteritems()):
@@ -57,6 +56,7 @@ def create_table(sheet):
     
     sql = 'CREATE TABLE %s ( id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, %s) ENGINE=innodb;' % (name, create_columns_sql)
     print sql
+
     cursor = connection.cursor()
 
     try:
@@ -65,27 +65,27 @@ def create_table(sheet):
     except Exception as e:
         print ("Failed to create table: %s, %s" % (name, e))
 
-
-    column_sql = ', '.join(columns)
+    column_sql = """date, player_id, player_surname, player_forename, team, team_id, opposition, opposition_id, venue, """
+    column_sql += ', '.join(columns)
 
     for row in range(sheet.nrows):
         if row == 0:
             continue
 
-#        row_values = [ ]
-#        count = 0
-#        for value in sheet.row_values(row):
-#            if count in varchar_column_indices:
-#                row_values.append("%s" % ("'" + str(value) + "'"))
-#            else:
-#                row_values.append(str(value))
-#            count += 1
-#
-#        values_sql = ','.join(row_values)
-#
-#        sql = 'INSERT INTO %s (%s) VALUES (%s);' % (name, column_sql, values_sql)
-#        print sql
-#        cursor.execute(sql)
+        row_values = [ ]
+        count = 0
+        for value in sheet.row_values(row):
+            if count in varchar_column_indices:
+                row_values.append("%s" % ("'" + str(value) + "'"))
+            else:
+                row_values.append(str(value))
+            count += 1
+
+        values_sql = ','.join(row_values)
+
+        sql = 'INSERT INTO %s (%s) VALUES (%s);' % (name, column_sql, values_sql)
+        print sql
+        cursor.execute(sql)
 
 def main():
     workbook = xlrd.open_workbook('../../mcfc_data/data.xls')
