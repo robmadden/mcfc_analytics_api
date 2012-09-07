@@ -7,7 +7,7 @@ import logging
 setup_environ(settings)
 
 import xlrd
-from django.db import connection, models
+from django.db import connection, transaction
 
 logger = logging.getLogger(__name__)
 
@@ -16,55 +16,8 @@ varchar_columns = [ 'Opposition', 'Player Surname', 'Player Forename', 'Team', '
 special_columns = date_columns + varchar_columns + [ "Player ID", "Team Id", "Opposition id" ]
 varchar_column_indices = [0, 2, 3, 4, 6, 8 ]
 
-def create_table(sheet):
-    name = sheet.name     # Table name
-
-    # The first row has the column names we want
-    row_values = sheet.row_values(0)
-
-    column_map = {}
-    for column in row_values:
-        if column in varchar_columns:
-            column_map[column] = "VARCHAR(20)"
-        elif column in date_columns:
-            column_map[column] = "DATETIME"
-        else:
-            column_map[column] = "INT"
-
-    create_columns_sql = ''
-    count = 0
-    columns = []
-
-    create_columns_sql = """date DATETIME, player_surname VARCHAR(20), player_forename VARCHAR(20),
-                            team VARCHAR(20), opposition VARCHAR(30),
-                            player_id INT, team_id INT, opposition_id INT, venue VARCHAR(30), 
-                            """
-
-    for k,v in sorted(column_map.iteritems()):
-        if k in special_columns:
-            count += 1
-            continue
-
-        k = k.replace(' ', '_').replace('-', '_').lower()
-
-        columns.append(k)
-        create_columns_sql += k + " " + v
-        if count != sheet.ncols-1:
-            create_columns_sql += ", "
-
-        count += 1
-    
-    sql = 'CREATE TABLE %s ( id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, %s) ENGINE=innodb;' % (name, create_columns_sql)
-    print sql
-
+def fill_table(sheet, columns, name):
     cursor = connection.cursor()
-
-    try:
-        cursor.execute(sql)
-        print ("Successfully created table: %s" % name)
-    except Exception as e:
-        print ("Failed to create table: %s, %s" % (name, e))
-
     column_sql = """date, player_id, player_surname, player_forename, team, team_id, opposition, opposition_id, venue, """
     column_sql += ', '.join(columns)
 
@@ -76,16 +29,61 @@ def create_table(sheet):
         count = 0
         for value in sheet.row_values(row):
             if count in varchar_column_indices:
-                row_values.append("%s" % ("'" + str(value) + "'"))
+                row_values.append("%s" % ('"' + value.encode('utf-8') + '"'))
             else:
-                row_values.append(str(value))
+                row_values.append(str(int(value)).encode('utf-8'))
             count += 1
 
         values_sql = ','.join(row_values)
 
-        sql = 'INSERT INTO %s (%s) VALUES (%s);' % (name, column_sql, values_sql)
-        print sql
+        sql = 'INSERT INTO %s (%s) VALUES (%s);' % (str(name), str(column_sql), str(values_sql))
+        # print sql
+
         cursor.execute(sql)
+        transaction.commit_unless_managed()
+
+def create_table(sheet):
+    name = sheet.name     # Table name
+
+    # The first row has the column names we want
+    row_values = sheet.row_values(0)
+    count = 0
+
+    create_columns_sql = """date DATETIME, player_surname VARCHAR(30), player_forename VARCHAR(30),
+                            team VARCHAR(50), opposition VARCHAR(50),
+                            player_id INT, team_id INT, opposition_id INT, venue VARCHAR(30),
+                            """
+    columns = []
+    for c in row_values:
+        if c in special_columns:
+            count += 1
+            continue
+
+        c = c.replace(' ', '_').replace('-', '_').lower()
+
+        create_columns_sql += c + " " + "INT"
+        columns.append(c)
+        
+        if count != sheet.ncols-1:
+            create_columns_sql += ", "
+
+        count += 1
+
+    
+    sql = 'CREATE TABLE %s ( id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, %s) ENGINE=innodb;' % (name, create_columns_sql)
+    #  print sql
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(sql)
+        print ("Successfully created table: %s" % name)
+    except Exception as e:
+        print ("Failed to create table: %s, %s" % (name, e))
+
+    fill_table(sheet, columns, name)
+
+    print "Done."
 
 def main():
     workbook = xlrd.open_workbook('../../mcfc_data/data.xls')
