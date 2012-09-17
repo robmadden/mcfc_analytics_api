@@ -15,6 +15,7 @@ date_columns = [ 'Date' ]
 varchar_columns = [ 'Opposition', 'Player Surname', 'Player Forename', 'Team', 'Venue' ]
 special_columns = date_columns + varchar_columns + [ "Player ID", "Team Id", "Opposition id" ]
 varchar_column_indices = [0, 2, 3, 4, 6, 8 ]
+MAX_INDEXES_ALLOWED = 64
 
 def fill_table(sheet, columns, name):
     cursor = connection.cursor()
@@ -53,6 +54,13 @@ def create_table(sheet):
                             team VARCHAR(50), opposition VARCHAR(50),
                             player_id INT, team_id INT, opposition_id INT, venue VARCHAR(30),
                             """
+
+    create_indexes_sql = """INDEX (date), INDEX (player_surname), INDEX (player_forename),
+                            INDEX (team), INDEX (opposition), INDEX (player_id), INDEX (team_id),
+                            INDEX (opposition_id), INDEX (venue),
+                         """
+    index_count = 10
+
     columns = []
     for c in row_values:
         if c in special_columns:
@@ -64,14 +72,20 @@ def create_table(sheet):
         create_columns_sql += c + " " + "INT"
         columns.append(c)
         
+        if index_count < MAX_INDEXES_ALLOWED:
+            create_indexes_sql += " INDEX (" + c + ")"
+            if index_count < MAX_INDEXES_ALLOWED-1:
+                create_indexes_sql += ", "
+            index_count += 1
+        
         if count != sheet.ncols-1:
             create_columns_sql += ", "
 
         count += 1
 
     
-    sql = 'CREATE TABLE %s ( id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, %s) ENGINE=innodb;' % (name, create_columns_sql)
-    #  print sql
+    sql = 'CREATE TABLE %s ( id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, %s, %s ) ENGINE=innodb;' % (name, create_columns_sql, create_indexes_sql)
+    print sql
 
     cursor = connection.cursor()
 
