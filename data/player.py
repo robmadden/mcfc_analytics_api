@@ -3,7 +3,45 @@ from db_helpers import run_singlerow_query, run_multirow_query
 class Player():
     def __init__(self, player_id):
         self.player_id = player_id
-        
+
+    ############################### DRIBBLING #################################
+
+    def get_touches(self):
+        """
+        Get the number of times a player touched the ball over the course of a season
+
+        :returns: ( player_id, player_surname, player_forename, touches)
+        """
+
+        sql = """SELECT player_id, player_surname, player_forename, SUM(touches)
+                 FROM players WHERE player_id=%s GROUP BY player_id;"""
+
+        return run_singlerow_query(sql, self.player_id)
+
+    def get_dispossessions(self):
+        """
+        Get the number of times a player was dispossed over an entire season
+
+        :returns: ( player_id, player_surname, player_forename, dispossesions)
+        """
+
+        sql = """SELECT player_id, player_surname, player_forename, SUM(dispossessed)
+                 FROM players WHERE player_id=%s GROUP BY player_id;"""
+
+        return run_singlerow_query(sql, self.player_id)
+
+    def get_turnovers(self):
+        """
+        Get the number of turnovers for a given player over an entire season
+
+        :returns: ( player_id, player_surname, player_forename, turnovers)
+        """
+
+        sql = """SELECT player_id, player_surname, player_forename, SUM(turnovers)
+                 FROM players WHERE player_id=%s GROUP BY player_id;"""
+
+        return run_singlerow_query(sql, self.player_id)
+
     ################################ PASSING ##################################
 
     def _run_passing_query(self, sql):
