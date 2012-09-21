@@ -1,19 +1,35 @@
     <!DOCYTPE html>
     <html>
-    <meta charset="utf-8">
-    <link rel="canonical" href="http://startingelev.in">
-    <title>Starting Elev.in</title>
-    <style>
+        <head>
+            <meta charset="utf-8">
+            <link rel="canonical" href="http://startingelev.in">
+            <title>Starting Elev.in</title>
+            <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?2.4.5"></script>
+            <script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js?2.4.5"></script>
+            <style>
+                @import url({{ STATIC_URL }}main.css);
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <img class="banner" src="{{ STATIC_URL }}banner.jpeg" alt="" />
+                <h1>Starting Elev.in</h1>
 
-    @import url({{ STATIC_URL }}main.css);
+                <h2><a name="teams" href="#teams">Teams</a></h2>
 
-    </style>
+                <ul>
+                    {% for id, team in teams %}
+                        <li>{{ team }}</li>
+                    {% endfor %}
+                </ul>
 
-    <h1>Starting Elev.in</h1>
-
-    <h2><a name="formations" href="#formations">#</a>Formations</h2>
-
-    <footer>
-      <aside>{{ date }}</aside>
-      <a href="./">Starting Elev.in</a>
-    </footer>
+                <script type="text/javascript" src="static/pie.js"></script>
+            </div>
+            <div class="footer">
+                <footer>
+                  <aside>{{ date }}</aside>
+                  Rob Madden
+                </footer>
+            </div>
+        </body>
+    </html>

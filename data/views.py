@@ -10,11 +10,14 @@
 import datetime
 
 from django.http import HttpResponse
-from django.template import Context
+from django.template import RequestContext, Context
 from django.template.loader import get_template
 
+from data import Data
+
 def html(request):
+    data = Data()
     t = get_template('index.html')
-    c = Context({"date": datetime.datetime.now()})
+    c = RequestContext(request, {"date": datetime.datetime.now(), "teams": data.get_teams()})
     html = t.render(c)
     return HttpResponse(html)

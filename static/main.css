@@ -9,6 +9,7 @@ body {
     margin: 1em auto 4em auto;
     position: relative;
     width: 900px;
+    min-height: 1000px;
     display: block;
 }
 
@@ -28,16 +29,23 @@ h1 {
     font-size: 64px;
     font-weight: 300;
     letter-spacing: -2px;
-    margin: .3em 0 .1em 0;
+    padding: .3em 0 .1em 0;
     display: block;
-    -webkit-margin-before: 0.25em;
-    -webkit-margin-after: 0.25em;
+    -webkit-padding-before: 0.25em;
+    -webkit-padding-after: 0.25em;
+    -webkit-padding-start: 0px;
+    -webkit-padding-end: 0px;
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
     -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    border-bottom: 1px solid;
 }
 
 h2 {
     font-size: 1.5em;
     font-weight: bold;
+    height: 40px;
 }
 
 h2 a {
@@ -45,24 +53,61 @@ h2 a {
     font-size: 1.5em;
     font-weight: bold;
     position: absolute;
-    width: 740px;
+    width: 900px;
+    text-decoration: none;
+}
+
+h3 {
+    color: steelblue;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: absolute;
+    width: 900px;
     text-decoration: none;
 }
 
 footer {
-    color: #636363;
+    color: steelBlue;
     font-size: small;
     margin-top: 8em;
-    display: block;
 }
 
 header aside, footer aside {
     text-align: right;
 }
+
 aside {
     display: block;
     font-size: small;
     right: 0;
     position: absolute;
     width: 180px;
+}
+
+li {
+    height: 25px;
+}
+
+ul {
+    list-style-type:none;
+    color: steelblue;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: absolute;
+    width: 900px;
+    text-decoration: none;
+    display: block;
+}
+
+svg {
+    float:right;
+}
+
+img {
+    border: 1px solid;
+}
+
+.container {
+    height:100%;
+    width:100%;
 }
