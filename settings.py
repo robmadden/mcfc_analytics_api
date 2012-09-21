@@ -1,4 +1,5 @@
 # Django settings for mcfc_analytics_api project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -103,9 +104,14 @@ ROOT_URLCONF = 'mcfc_analytics_api.urls'
 WSGI_APPLICATION = 'mcfc_analytics_api.wsgi.application'
 
 TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.static',
 )
 
 INSTALLED_APPS = (
@@ -115,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'data',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
