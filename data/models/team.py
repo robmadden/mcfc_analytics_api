@@ -4,7 +4,18 @@ from db_helpers import run_multirow_query, run_singlerow_query
 class Team():
     def __init__(self, team_id):
         self.team_id = team_id
-        
+
+    def get_games_played(self):
+        """
+        Get the number of games a team played
+
+        :returns: (team_id, team_name, games played)
+        """
+        sql = """SELECT player_id, player_surname, player_forename, team
+                 FROM players WHERE team_id=%s GROUP BY player_id, team_ix  """
+
+        return run_multirow_query(sql, self.team_id)
+
     def get_players_on_team(self):
         """
         Get all players on a team given a team ID

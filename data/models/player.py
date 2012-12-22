@@ -4,6 +4,18 @@ class Player():
     def __init__(self, player_id):
         self.player_id = player_id
 
+    def get_minutes_played(self):
+        """
+        Get the number of minutes a player played in a season
+
+        :returns: ( player_id, player_surname, player_forename, minutes played)
+        """
+
+        sql = """SELECT player_id, player_surname, player_forename, SUM(time_played)
+                 FROM players WHERE player_id=%s GROUP BY player_id;"""
+
+        return run_singlerow_query(sql, self.player_id)
+
     ############################### DRIBBLING #################################
 
     def get_touches(self):
